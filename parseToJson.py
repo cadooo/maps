@@ -36,11 +36,13 @@ for item in soup.findAll('row'):
   point["geometry"]["type"] = "Point"
 
   coord = list() 
-  #getCDATA(item.find('address').text)
+  point["properties"]["popupContent"] = getCDATA(item.find('address').text)
   coord.append(getCDATA(item.find('long').text))
   coord.append(getCDATA(item.find('lat').text))
   point["geometry"]["coordinates"] = coord
   geoFence(point)
 
-with open('gs.geojson', 'w') as outfile:
+with open('gs.js', 'w') as outfile:
+  outfile.write("var garageSales = ")
   json.dump(out,outfile)
+  outfile.write(";")

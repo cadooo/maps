@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Leaflet mobile example</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<link rel="stylesheet" href="leaflet.css" />
+<script src="gs.js" type="text/javascript"></script>
+
+<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+
+<style>
+body {
+padding: 0;
+margin: 0;
+}
+html, body, #map {
+height: 100%;
+}
+</style>
+</head>
+<body>
+<div id="map"></div>
+
+<script>
+var map = L.map('map');
+
+L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
+maxZoom: 18,
+attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+id: 'examples.map-i86knfo3'
+}).addTo(map);
+
+function onEachFeature(feature, layer) {
+  var popupContent = ""
+  if (feature.properties && feature.properties.popupContent) {
+    popupContent += feature.properties.popupContent;
+  }
+
+  layer.bindPopup(popupContent);
+}
+
+
+L.geoJson(garageSales, {
+
+filter: function (feature, layer) {
+if (feature.properties) {
+// If the property "underConstruction" exists and is true, return false (don't render features under construction)
+return feature.properties.underConstruction !== undefined ? !feature.properties.underConstruction : true;
+}
+return false;
+},
+
+onEachFeature: onEachFeature
+}).addTo(map);
+
+function onLocationFound(e) {
+  var radius = e.accuracy / 2;
+
+  L.marker(e.latlng).addTo(map)
+    .bindPopup("You are within " + radius + " meters from this point").openPopup();
+
+  L.circle(e.latlng, radius).addTo(map);
+}
+
+function onLocationError(e) {
+  alert(e.message);
+}
+
+map.on('locationfound', onLocationFound);
+map.on('locationerror', onLocationError);
+
+map.locate({setView: true, maxZoom: 16});
+</script>
+</body>
+</html>
+
